@@ -1,0 +1,271 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Harshal's Portfolio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: #f4f4f4;
+        }
+        .hero {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            justify-content: center;
+            height: 100vh;
+            text-align: right;
+            background-image: url('https://harshalr07.github.io/<your-repo-name>/‪C:\Users\harsh\Downloads\removed.jpg');
+            background-size: cover;
+            background-position: center;
+            color: #fff;
+            padding: 2rem;
+            animation: fadeIn 1s ease-in;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5); /* Semi-transparent overlay for text readability */
+            z-index: 1;
+        }
+        .hero > * {
+            position: relative;
+            z-index: 2;
+        }
+        .headline {
+            font-size: 2.5rem;
+            font-weight: 400;
+            margin-bottom: 0.5rem;
+        }
+        .headline .name {
+            font-weight: 700;
+            background: linear-gradient(#FF0000 40%, #000000 60%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .subname {
+            font-size: 1rem;
+            font-weight: 300;
+            color: #cccccc;
+            margin-top: 0.2rem;
+        }
+        .section {
+            padding: 4rem 2rem;
+            text-align: center;
+            background: #fff;
+            color: #333;
+            opacity: 0;
+            animation: fadeIn 1s ease-in forwards;
+            animation-delay: 0.2s;
+        }
+        .section h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: #1a1a1a;
+        }
+        .section p {
+            font-size: 1rem;
+            line-height: 1.6;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .about-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: left;
+        }
+        .profile-pic {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #FF0000;
+        }
+        .about-text {
+            flex: 1;
+        }
+        .skills-list, .projects-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .skill, .project {
+            background: #1a1a1a;
+            color: #fff;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+        .project {
+            flex: 1 1 200px;
+            max-width: 300px;
+            text-align: left;
+        }
+        .project a {
+            color: #FF0000;
+            text-decoration: none;
+        }
+        .project a:hover {
+            text-decoration: underline;
+        }
+        .contact-links {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+        .contact-links a {
+            color: #FF0000;
+            font-size: 2rem;
+            transition: color 0.3s;
+        }
+        .contact-links a:hover {
+            color: #cc0000;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @media (max-width: 768px) {
+            .hero {
+                align-items: center;
+                text-align: center;
+            }
+            .headline {
+                font-size: 1.8rem;
+            }
+            .subname {
+                font-size: 0.8rem;
+            }
+            .section {
+                padding: 2rem 1rem;
+            }
+            .section h2 {
+                font-size: 1.5rem;
+            }
+            .about-content {
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+            }
+            .profile-pic {
+                width: 100px;
+                height: 100px;
+            }
+            .skill, .project {
+                font-size: 0.8rem;
+            }
+            .contact-links a {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <section class="hero">
+        <h1 class="headline">Come in, I'm <span class="name">HARSHAL</span></h1>
+        <h2 class="subname">RAMACHANDRA REDDY</h2>
+    </section>
+    <section class="section" id="about">
+        <h2>About Me</h2>
+        <div class="about-content">
+            <img src="‪------------------------" class="profile-pic">
+            <div class="about-text">
+                <p>I'm Harshal R, a 16-year-old tech enthusiast, son of Ramachandra Reddy and Manjula. I’m passionate about training computers, penetration testing, and solving complex problems. Proud to be the first student at <a href="https://roboticschools.com/" target="_blank">Robotic Schools</a>, where I learned the basics of robotics, I’m always diving deeper into the world of tech.</p>
+            </div>
+        </div>
+    </section>
+    <section class="section" id="skills">
+        <h2>Skills</h2>
+        <div class="skills-list">
+            <span class="skill">Artificial Intelligence</span>
+            <span class="skill">Penetration Testing</span>
+            <span class="skill">Robotics Basics</span>
+            <span class="skill">Problem Solving</span>
+            <span class="skill">Python</span>
+        </div>
+    </section>
+    <section class="section" id="projects">
+        <h2>Projects</h2>
+        <div class="projects-list">
+            <div class="project">
+                <p><strong>AI Chatbot</strong><br>A Python-based chatbot using NLP to assist users.<br><a href="https://github.com/Harshalr07/ai-chatbot" target="_blank">View on GitHub</a></p>
+            </div>
+            <div class="project">
+                <p><strong>Penetration Testing Tool</strong><br>A script for network vulnerability scanning.<br><a href="https://github.com/Harshalr07/pen-test-tool" target="_blank">View on GitHub</a></p>
+            </div>
+        </div>
+    </section>
+    <section class="section" id="hobbies">
+        <h2>Hobbies & Interests</h2>
+        <p>My hobbies revolve around exploring computers and artificial intelligence. Whether it’s tinkering with code, experimenting with AI models, or diving into the latest tech trends, I’m always curious and eager to learn more.</p>
+    </section>
+    <section class="section" id="contact">
+        <h2>Contact Me</h2>
+        <p>Reach out to me for collabs or just to geek out about tech!</p>
+        <div class="contact-links">
+            <a href="mailto:harshal@example.com" title="Email"><i class="fas fa-envelope"></i></a>
+            <a href="https://github.com/Harshalr07" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>
+            <a href="https://www.instagram.com/harshalramachandra/" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>
+        </div>
+    </section>
+</body>
+</html>
